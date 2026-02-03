@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-sdl2 = "0.35.2"
+sdl2 = { version = "0.36"}
 rand = "0.8.4"
 image = "0.24"
