@@ -90,11 +90,11 @@ fn main() -> Result<(), String> {
         for event in event_pump.poll_iter() {
             match event {
                 Event::Quit { .. } | Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
-                    if !vec_timer.is_empty() {
-                        let max_timer = vec_timer.iter().max().unwrap();
-                        let min_timer = vec_timer.iter().min().unwrap();
-                        write_stats(nbr_cars, collision_just, nb_collision, max_speed, min_speed, max_timer, min_timer);
-                    }
+                    // if !vec_timer.is_empty() {
+                    //     let max_timer = vec_timer.iter().max().unwrap();
+                    //     let min_timer = vec_timer.iter().min().unwrap();
+                    //     write_stats(nbr_cars, collision_just, nb_collision, max_speed, min_speed, max_timer, min_timer);
+                    // }
                     break 'running;
                 }
                 Event::KeyDown { keycode: Some(k), .. } => {
