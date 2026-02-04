@@ -23,7 +23,7 @@ use sdl2::video::WindowContext;
 use std::collections::VecDeque;
 use std::time::Duration;
 
-const CAR_WIDTH: u32 = 25;
+const CAR_WIDTH: u32 = 35;
 const CAR_HEIGHT: u32 = 30;
 const DISTANCE: i32 = 30;
 const SAFE_DISTANCE: i32 = 300;
@@ -63,15 +63,15 @@ fn main() -> Result<(), String> {
     let texture_creator = canvas.texture_creator();
 
     // Charji t-sawer (T-akked blli l-fichies f had l-blasa)
-    let car_texture = load_texture_from_path(&texture_creator, "src/img/car.png")?;
+    let car_texture = load_texture_from_path(&texture_creator, "src/img/aaaa.png")?;
     let road_texture = load_texture_from_path(&texture_creator, "src/img/road.jpg")?;
 
     let mut rect: VecDeque<Vehicule> = VecDeque::new();
-    let mut nbr_cars: i32 = 0;
-    let mut collision_just = 0;
-    let nb_collision = 0;
-    let max_speed: i32 = 3;
-    let min_speed: i32 = 1;
+    // let mut nbr_cars: i32 = 0;
+    // let mut collision_just = 0;
+    // let nb_collision = 0;
+    // let max_speed: i32 = 3;
+    // let min_speed: i32 = 1;
     let mut can_add = false;
     let mut cooldown_time = 0;
     let mut vec_timer: Vec<Duration> = Vec::new();
@@ -133,7 +133,7 @@ fn main() -> Result<(), String> {
                     if v_mut.collides_with(v_other, SAFE_DISTANCE) { state_accel = false; }
                     if v_mut.collides_with(v_other, DISTANCE) {
                         actif = false;
-                        if v_mut.states { collision_just += 1; }
+                       // if v_mut.states { collision_just += 1; }
                         v_mut.states = false;
                         break;
                     }
@@ -155,7 +155,7 @@ fn main() -> Result<(), String> {
             };
 
             if out {
-                nbr_cars += 1;
+              // nbr_cars += 1;
                 vec_timer.push(v_mut.timer.elapsed());
             } else {
                 new_cars.push_back(*v_mut);
