@@ -25,14 +25,13 @@ use std::time::Duration;
 
 const CAR_WIDTH: u32 = 25;
 const CAR_HEIGHT: u32 = 30;
-const DISTANCE: i32 = 50;
+const DISTANCE: i32 = 30;
 const SAFE_DISTANCE: i32 = 300;
-const COOLDOWN_ACCEPT: i32 = 500;
 
 mod vehicule;
 use vehicule::*;
-mod stats;
-use stats::*;
+mod data;
+use data::*;
 
 // Function bach t-charji t-sawer bla SDL2_image (Pure Rust)
 fn load_texture_from_path<'a>(
@@ -72,18 +71,18 @@ fn main() -> Result<(), String> {
     let mut collision_just = 0;
     let nb_collision = 0;
     let max_speed: i32 = 3;
-    let mut min_speed: i32 = 3;
-    let mut cooldown_spawn = false;
+    let min_speed: i32 = 1;
+    let mut can_add = false;
     let mut cooldown_time = 0;
     let mut vec_timer: Vec<Duration> = Vec::new();
 
     let mut event_pump = sdl_context.event_pump()?;
 
     'running: loop {
-        if cooldown_spawn {
+        if can_add {
             cooldown_time += 1;
-            if cooldown_time >= COOLDOWN_ACCEPT {
-                cooldown_spawn = false;
+            if cooldown_time >= 300 {
+                can_add = false;
                 cooldown_time = 0;
             }
         }
@@ -99,7 +98,7 @@ fn main() -> Result<(), String> {
                     break 'running;
                 }
                 Event::KeyDown { keycode: Some(k), .. } => {
-                    if !cooldown_spawn {
+                    if !can_add {
                         let mut rng = rand::thread_rng();
                         let (x, y, dir, angle) = match k {
                             Keycode::Up    => (410 + (rng.gen_range(0..3)*45), 800, Direction::Up, 0.0),
@@ -109,12 +108,12 @@ fn main() -> Result<(), String> {
                             _ => (0, 0, Direction::Up, 0.0),
                         };
 
-                        if k == Keycode::Up || k == Keycode::Down || k == Keycode::Left || k == Keycode::Right || k == Keycode::R {
+                        if k == Keycode::Up || k == Keycode::Down || k == Keycode::Left || k == Keycode::Right  {
                             let ranger = rng.gen_range(0..3)*45;
-                            let mut v = Vehicule::new(x, y, dir, angle, ranger);
+                            let mut v = Vehicule::new(x, y, dir, angle);
                             if ranger == 0 || ranger == 90 { v.turning = true; }
                             rect.push_back(v);
-                            cooldown_spawn = true;
+                            can_add = true;
                         }
                     }
                 }
@@ -142,13 +141,14 @@ fn main() -> Result<(), String> {
             }
 
             if actif {
-                if v_mut.should_update() {
+                if v_mut.frame_count >= 10 {
                     v_mut.speed = if state_accel { 3 } else { 1 };
                     v_mut.update();
-                    v_mut.reset_frame_count();
-                } else { v_mut.increment_frame_count(); }
+                    v_mut.frame_count = 0;
+                } else {     
+                    v_mut.frame_count += 1; 
+                }
             }
-
             let out = match v_mut.direction {
                 Direction::Up => v_mut.y < -30, Direction::Down => v_mut.y > 830,
                 Direction::Left => v_mut.x < -30, Direction::Right => v_mut.x > 830,
@@ -178,7 +178,6 @@ fn main() -> Result<(), String> {
         }
 
         canvas.present();
-       // std::thread::sleep(Duration::from_millis(16)); // ~60 FPS
     }
     Ok(())
 }

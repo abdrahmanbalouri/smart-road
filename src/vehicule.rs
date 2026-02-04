@@ -2,7 +2,6 @@ use std::time::Instant;
 
 const CAR_WIDTH: u32 = 25;
 const CAR_HEIGHT: u32 = 30;
-const UPDATE_THRESHOLD: u32 = 10;
 
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub enum Direction {
@@ -16,21 +15,19 @@ pub struct Vehicule {
     pub direction: Direction,
     pub speed: i32,
     pub distance: i32,
-    pub time: i32,
     pub timer: Instant,
     pub states: bool,
     pub frame_count: u32,
     pub angle: f64,
-    pub cote: i32,
     pub turning: bool, 
 }
 
 impl Vehicule {
-    pub fn new(x: i32, y: i32, direction: Direction, angle: f64, cote: i32) -> Self {
+    pub fn new(x: i32, y: i32, direction: Direction, angle: f64) -> Self {
         Vehicule {
-            x, y, direction, speed: 3, distance: 0, time: 0,
+            x, y, direction, speed: 3, distance: 0,
             timer: Instant::now(),
-            states: true, frame_count: 0, angle, cote, turning: false,
+            states: true, frame_count: 0, angle, turning: false,
         }
     }
 
@@ -105,10 +102,7 @@ impl Vehicule {
             Direction::Right => self.x += self.speed,
         }
         self.distance += self.speed;
-        self.time += 1;
     }
 
-    pub fn should_update(&mut self) -> bool { self.frame_count >= UPDATE_THRESHOLD }
-    pub fn reset_frame_count(&mut self) { self.frame_count = 0; }
-    pub fn increment_frame_count(&mut self) { self.frame_count += 1; }
+  
 }
