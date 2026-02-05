@@ -25,7 +25,7 @@ use std::time::Duration;
 
 const CAR_WIDTH: u32 = 35;
 const CAR_HEIGHT: u32 = 30;
-const DISTANCE: i32 = 200;
+const DISTANCE: i32 = 40;
 const SAFE_DISTANCE: i32 = 300;
 
 
