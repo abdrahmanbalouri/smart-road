@@ -126,14 +126,14 @@ fn main() -> Result<(), String> {
         let mut new_cars = VecDeque::new();
         let current_state = rect.clone();
         for (i, v_mut) in rect.iter_mut().enumerate() {
-            let mut actif = true;
+            let mut can_update_car = true;
             let mut spedd_bolean = true;
 
             for (j, v_other) in current_state.iter().enumerate() {
                 if i != j {
                     if v_mut.collitions(v_other, SAFE_DISTANCE) { spedd_bolean = false; }
                     if v_mut.collitions(v_other, DISTANCE) {
-                        actif = false;
+                        can_update_car = false;
                         if v_mut.states { close_calls += 1; }
                         v_mut.states = false;
                         break;
@@ -141,7 +141,7 @@ fn main() -> Result<(), String> {
                 }
             }
 
-            if actif {
+            if can_update_car {
                 if v_mut.frame_count >= 10 {
                     v_mut.speed = if spedd_bolean { 3 } else { 1 };
                     v_mut.update();
