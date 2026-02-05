@@ -94,7 +94,7 @@ fn main() -> Result<(), String> {
                      if !vec_timer.is_empty() {
                         let max_timer = vec_timer.iter().max().unwrap();
                          let min_timer = vec_timer.iter().min().unwrap();
-                     //    write_stats(nbr_cars, max_speed, min_speed, max_timer, min_timer,close_calls);
+                        // data(nbr_cars, max_speed, min_speed, max_timer, min_timer,close_calls);
                      }
                     break 'running;
                 }
