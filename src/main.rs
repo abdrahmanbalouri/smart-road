@@ -101,16 +101,16 @@ fn main() -> Result<(), String> {
                 Event::KeyDown { keycode: Some(k), .. } => {
                     if !can_add {
                         let mut rng = rand::thread_rng();
+                        let ranger = rng.gen_range(0..3)*45;
                         let (x, y, dir, angle) = match k {
-                            Keycode::Up    => (410 + (rng.gen_range(0..3)*45), 800, Direction::Up, 0.0),
-                            Keycode::Down  => (275 + (rng.gen_range(0..3)*45), 0, Direction::Down, 180.0),
-                            Keycode::Left  => (800, 270 + (rng.gen_range(0..3)*45), Direction::Left, -90.0),
-                            Keycode::Right => (0, 400 + (rng.gen_range(0..3)*45), Direction::Right, 90.0),
+                            Keycode::Up    => (410 + (ranger), 800, Direction::Up, 0.0),
+                            Keycode::Down  => (275 + (ranger), 0, Direction::Down, 180.0),
+                            Keycode::Left  => (800, 270 + (ranger), Direction::Left, -90.0),
+                            Keycode::Right => (0, 400 + (ranger), Direction::Right, 90.0),
                             _ => (0, 0, Direction::Up, 0.0),
                         };
 
                         if k == Keycode::Up || k == Keycode::Down || k == Keycode::Left || k == Keycode::Right  {
-                            let ranger = rng.gen_range(0..3)*45;
                             let mut v = Vehicule::new(x, y, dir, angle);
                             if ranger == 0 || ranger == 90 { v.turning = true; }
                             rect.push_back(v);
