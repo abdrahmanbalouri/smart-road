@@ -87,7 +87,7 @@ fn main() -> Result<(), String> {
     'running: loop {
         if can_add {
             cooldown_time += 1;
-            if cooldown_time >= 300 {
+            if cooldown_time >= 350 {
                 can_add = false;
                 cooldown_time = 0;
             }
