@@ -74,7 +74,6 @@ fn main() -> Result<(), String> {
     let mut can_add = false;
     let mut cooldown_time = 0;
     let mut close_calls: i32 = 0;
-     let nbr_cars: i32 = 1000;
     let mut vec_timer: Vec<Duration> = Vec::new();
 
     let mut event_pump = sdl_context.event_pump()?;
@@ -156,7 +155,7 @@ fn main() -> Result<(), String> {
             };
 
             if out {
-               nbr_of_cars += 1;
+                nbr_of_cars += 1;
                 vec_timer.push(v_mut.timer.elapsed());
             } else {
                 new_cars.push_back(*v_mut);
