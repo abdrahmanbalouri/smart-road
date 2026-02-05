@@ -25,8 +25,9 @@ use std::time::Duration;
 
 const CAR_WIDTH: u32 = 35;
 const CAR_HEIGHT: u32 = 30;
-const DISTANCE: i32 = 30;
+const DISTANCE: i32 = 200;
 const SAFE_DISTANCE: i32 = 300;
+
 
 mod vehicule;
 use vehicule::*;
@@ -67,13 +68,13 @@ fn main() -> Result<(), String> {
     let road_texture = load_texture_from_path(&texture_creator, "src/img/road.jpg")?;
 
     let mut rect: VecDeque<Vehicule> = VecDeque::new();
-    // let mut nbr_cars: i32 = 0;
-    // let mut collision_just = 0;
-    // let nb_collision = 0;
-    // let max_speed: i32 = 3;
-    // let min_speed: i32 = 1;
+    let mut nbr_of_cars: i32 = 0;
+     let max_speed: i32 = 3;
+     let min_speed: i32 = 1;
     let mut can_add = false;
     let mut cooldown_time = 0;
+    let mut close_calls: i32 = 0;
+     let nbr_cars: i32 = 1000;
     let mut vec_timer: Vec<Duration> = Vec::new();
 
     let mut event_pump = sdl_context.event_pump()?;
@@ -90,11 +91,11 @@ fn main() -> Result<(), String> {
         for event in event_pump.poll_iter() {
             match event {
                 Event::Quit { .. } | Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
-                    // if !vec_timer.is_empty() {
-                    //     let max_timer = vec_timer.iter().max().unwrap();
-                    //     let min_timer = vec_timer.iter().min().unwrap();
-                    //     write_stats(nbr_cars, collision_just, nb_collision, max_speed, min_speed, max_timer, min_timer);
-                    // }
+                     if !vec_timer.is_empty() {
+                        let max_timer = vec_timer.iter().max().unwrap();
+                         let min_timer = vec_timer.iter().min().unwrap();
+                     //    write_stats(nbr_cars, max_speed, min_speed, max_timer, min_timer,close_calls);
+                     }
                     break 'running;
                 }
                 Event::KeyDown { keycode: Some(k), .. } => {
@@ -126,14 +127,14 @@ fn main() -> Result<(), String> {
         let current_state = rect.clone();
         for (i, v_mut) in rect.iter_mut().enumerate() {
             let mut actif = true;
-            let mut state_accel = true;
+            let mut spedd_bolean = true;
 
             for (j, v_other) in current_state.iter().enumerate() {
                 if i != j {
-                    if v_mut.collides_with(v_other, SAFE_DISTANCE) { state_accel = false; }
-                    if v_mut.collides_with(v_other, DISTANCE) {
+                    if v_mut.collitions(v_other, SAFE_DISTANCE) { spedd_bolean = false; }
+                    if v_mut.collitions(v_other, DISTANCE) {
                         actif = false;
-                       // if v_mut.states { collision_just += 1; }
+                        if v_mut.states { close_calls += 1; }
                         v_mut.states = false;
                         break;
                     }
@@ -142,7 +143,7 @@ fn main() -> Result<(), String> {
 
             if actif {
                 if v_mut.frame_count >= 10 {
-                    v_mut.speed = if state_accel { 3 } else { 1 };
+                    v_mut.speed = if spedd_bolean { 3 } else { 1 };
                     v_mut.update();
                     v_mut.frame_count = 0;
                 } else {     
@@ -150,12 +151,12 @@ fn main() -> Result<(), String> {
                 }
             }
             let out = match v_mut.direction {
-                Direction::Up => v_mut.y < -30, Direction::Down => v_mut.y > 830,
-                Direction::Left => v_mut.x < -30, Direction::Right => v_mut.x > 830,
+                Direction::Up => v_mut.y < -10, Direction::Down => v_mut.y > 810,
+                Direction::Left => v_mut.x < -10, Direction::Right => v_mut.x > 810,
             };
 
             if out {
-              // nbr_cars += 1;
+               nbr_of_cars += 1;
                 vec_timer.push(v_mut.timer.elapsed());
             } else {
                 new_cars.push_back(*v_mut);

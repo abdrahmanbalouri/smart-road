@@ -31,7 +31,7 @@ impl Vehicule {
         }
     }
 
-    pub fn collides_with(&self, other: &Vehicule, safe_distance: i32) -> bool {
+    pub fn collitions(&self, other: &Vehicule, safe_distance: i32) -> bool {
         match self.direction {
             Direction::Down => {
                 let dx = (other.x - self.x).abs();
