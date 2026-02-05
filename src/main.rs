@@ -23,7 +23,6 @@ use sdl2::video::WindowContext;
 use std::collections::VecDeque;
 use std::time::Duration;
 
-
 const CAR_WIDTH: u32 = 35;
 const CAR_HEIGHT: u32 = 30;
 const DISTANCE: i32 = 40;
@@ -34,7 +33,6 @@ use vehicule::*;
 mod data;
 use data::*;
 
-// Function bach t-charji t-sawer bla SDL2_image (Pure Rust)
 fn load_texture_from_path<'a>(
     texture_creator: &'a TextureCreator<WindowContext>,
     path: &str,
@@ -56,7 +54,7 @@ fn main() -> Result<(), String> {
     let video_subsystem = sdl_context.video()?;
 
     let window = video_subsystem
-        .window("==== Smart Road (Pure Rust Image Loading) ====", 800, 800)
+        .window("Smart_Road", 800, 800)
         .position_centered()
         .build()
         .map_err(|e| e.to_string())?;
@@ -69,13 +67,13 @@ fn main() -> Result<(), String> {
     let texture_creator = canvas.texture_creator();
 
     // Charji t-sawer (T-akked blli l-fichies f had l-blasa)
-    let car_texture = load_texture_from_path(&texture_creator, "src/img/aaaa.png")?;
+    let car_texture = load_texture_from_path(&texture_creator, "src/img/car.png")?;
     let road_texture = load_texture_from_path(&texture_creator, "src/img/road.jpg")?;
 
     let mut rect: VecDeque<Vehicule> = VecDeque::new();
-      let mut nbr_of_cars: i32 = 0;
+    let mut nbr_of_cars: i32 = 0;
     let max_speed: i32 = 3;
-    let min_speed: i32 = 1;
+    let min_speed: i32 = 0;
     let mut can_add = false;
     let mut cooldown_time = 0;
     let mut close_calls: i32 = 0;
@@ -128,7 +126,7 @@ fn main() -> Result<(), String> {
                             );
                             break 'running;
                         }
-                    }else{
+                    } else {
                         break 'running;
                     }
                 }
@@ -145,22 +143,24 @@ fn main() -> Result<(), String> {
                         } else {
                             k
                         };
+                        
 
+                        let ranger = rng.gen_range(0..3) * 45;
                         let (x, y, dir, angle) = match key {
                             Keycode::Up => {
-                                (410 + (rng.gen_range(0..3) * 45), 800, Direction::Up, 0.0)
+                                (410 + ranger, 800, Direction::Up, 0.0)
                             }
                             Keycode::Down => {
-                                (275 + (rng.gen_range(0..3) * 45), 0, Direction::Down, 180.0)
+                                (275 + ranger, 0, Direction::Down, 180.0)
                             }
                             Keycode::Left => (
                                 800,
-                                270 + (rng.gen_range(0..3) * 45),
+                                270 + ranger,
                                 Direction::Left,
                                 -90.0,
                             ),
                             Keycode::Right => {
-                                (0, 400 + (rng.gen_range(0..3) * 45), Direction::Right, 90.0)
+                                (0, 400 + ranger, Direction::Right, 90.0)
                             }
                             _ => (0, 0, Direction::Up, 0.0),
                         };
@@ -170,7 +170,6 @@ fn main() -> Result<(), String> {
                             || key == Keycode::Left
                             || key == Keycode::Right
                         {
-                            let ranger = rng.gen_range(0..3) * 45;
                             let mut v = Vehicule::new(x, y, dir, angle);
                             if ranger == 0 || ranger == 90 {
                                 v.turning = true;
@@ -215,6 +214,10 @@ fn main() -> Result<(), String> {
                     } else {
                         v_mut.frame_count += 1;
                     }
+                } else {
+                    v_mut.speed = 0;
+                    v_mut.update();
+                   // v_mut.frame_count = 0;
                 }
                 let out = match v_mut.direction {
                     Direction::Up => v_mut.y < -10,
@@ -232,7 +235,6 @@ fn main() -> Result<(), String> {
             }
             rect = new_cars;
 
-            
             // --- DRAWING ---
             canvas.set_draw_color(Color::RGB(0, 0, 0));
             canvas.clear();
