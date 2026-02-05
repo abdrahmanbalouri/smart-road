@@ -1,11 +1,26 @@
-use std::time::Instant;
+/*
+   ███████╗ ██████╗ ███╗   ██╗███████╗ ██████╗  ██╗
+   ╚══███╔╝██╔═══██╗████╗  ██║██╔════╝██╔═████╗███║
+     ███╔╝ ██║   ██║██╔██╗ ██║█████╗  ██║██╔██║╚██║
+    ███╔╝  ██║   ██║██║╚██╗██║██╔══╝  ████╔╝██║ ██║
+   ███████╗╚██████╔╝██║ ╚████║███████╗╚██████╔╝ ██║
+   ╚══════╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝ ╚═════╝  ╚═╝
 
+   Author : abalouri
+   File   : main.rs
+   Project: smart-road
+   Date   : 3/02/2026
+*/
+use std::time::Instant;
 const CAR_WIDTH: u32 = 25;
 const CAR_HEIGHT: u32 = 30;
 
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub enum Direction {
-    Up, Down, Left, Right,
+    Up,
+    Down,
+    Left,
+    Right,
 }
 
 #[derive(Clone, Copy)]
@@ -19,15 +34,22 @@ pub struct Vehicule {
     pub states: bool,
     pub frame_count: u32,
     pub angle: f64,
-    pub turning: bool, 
+    pub turning: bool,
 }
 
 impl Vehicule {
     pub fn new(x: i32, y: i32, direction: Direction, angle: f64) -> Self {
         Vehicule {
-            x, y, direction, speed: 3, distance: 0,
+            x,
+            y,
+            direction,
+            speed: 3,
+            distance: 0,
             timer: Instant::now(),
-            states: true, frame_count: 0, angle, turning: false,
+            states: true,
+            frame_count: 0,
+            angle,
+            turning: false,
         }
     }
 
@@ -36,49 +58,75 @@ impl Vehicule {
             Direction::Down => {
                 let dx = (other.x - self.x).abs();
                 let dy = (other.y - self.y).abs();
-                if other.y >= self.y { return dy <= safe_distance && dx < (CAR_WIDTH as i32); }
+                if other.y >= self.y {
+                    return dy <= safe_distance && dx < (CAR_WIDTH as i32);
+                }
             }
             Direction::Up => {
                 let dx = (self.x - other.x).abs();
                 let dy = (self.y - other.y).abs();
-                if self.y >= other.y { return dy <= safe_distance && dx < (CAR_WIDTH as i32); }
+                if self.y >= other.y {
+                    return dy <= safe_distance && dx < (CAR_WIDTH as i32);
+                }
             }
             Direction::Left => {
                 let dx = (self.x - other.x).abs();
                 let dy = (self.y - other.y).abs();
-                if self.x >= other.x { return dx <= safe_distance && dy < (CAR_HEIGHT as i32); }
+                if self.x >= other.x {
+                    return dx <= safe_distance && dy < (CAR_HEIGHT as i32);
+                }
             }
             Direction::Right => {
                 let dx = (other.x - self.x).abs();
                 let dy = (other.y - self.y).abs();
-                if other.x >= self.x { return dx <= safe_distance && dy < (CAR_HEIGHT as i32); }
+                if other.x >= self.x {
+                    return dx <= safe_distance && dy < (CAR_HEIGHT as i32);
+                }
             }
         }
         false
     }
 
     pub fn should_turning(&self) -> Option<Direction> {
-        if !self.turning { return None; }
+        if !self.turning {
+            return None;
+        }
         match self.direction {
             Direction::Up => {
-                if self.y <= 355 && self.x == 410 { Some(Direction::Left) }
-                else if self.y <= 490 && self.x == 500 { Some(Direction::Right) }
-                else { None }
+                if self.y <= 355 && self.x == 410 {
+                    Some(Direction::Left)
+                } else if self.y <= 490 && self.x == 500 {
+                    Some(Direction::Right)
+                } else {
+                    None
+                }
             }
             Direction::Down => {
-                if self.y >= 405 && self.x == 365 { Some(Direction::Right) }
-                else if self.y >= 270 && self.x == 275 { Some(Direction::Left) }
-                else { None }
+                if self.y >= 405 && self.x == 365 {
+                    Some(Direction::Right)
+                } else if self.y >= 270 && self.x == 275 {
+                    Some(Direction::Left)
+                } else {
+                    None
+                }
             }
             Direction::Left => {
-                if self.y == 270 && self.x <= 500 { Some(Direction::Up) }
-                else if self.y == 360 && self.x <= 365 { Some(Direction::Down) }
-                else { None }
+                if self.y == 270 && self.x <= 500 {
+                    Some(Direction::Up)
+                } else if self.y == 360 && self.x <= 365 {
+                    Some(Direction::Down)
+                } else {
+                    None
+                }
             }
             Direction::Right => {
-                if self.y == 400 && self.x >= 405 { Some(Direction::Up) }
-                else if self.y == 490 && self.x >= 275 { Some(Direction::Down) }
-                else { None }
+                if self.y == 400 && self.x >= 405 {
+                    Some(Direction::Up)
+                } else if self.y == 490 && self.x >= 275 {
+                    Some(Direction::Down)
+                } else {
+                    None
+                }
             }
         }
     }
@@ -103,6 +151,4 @@ impl Vehicule {
         }
         self.distance += self.speed;
     }
-
-  
 }
