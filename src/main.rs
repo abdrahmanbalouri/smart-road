@@ -25,6 +25,9 @@ use sdl2::video::WindowContext;
 use std::collections::VecDeque;
 use std::time::Duration;
 
+use image::{Rgba, RgbaImage};
+use rusttype::{Font, Scale};
+
 const CAR_WIDTH: u32 = 35;
 const CAR_HEIGHT: u32 = 30;
 const DISTANCE: i32 = 40;
@@ -52,7 +55,6 @@ fn load_texture_from_path<'a>(
         .create_texture_from_surface(&surface)
         .map_err(|e| e.to_string())
 }
-
 fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
@@ -104,35 +106,35 @@ fn main() -> Result<(), String> {
                     ..
                 } => {
                     if !vec_timer.is_empty() {
-                        let max_timer = vec_timer.iter().max().unwrap();
-                        let min_timer = vec_timer.iter().min().unwrap();
-                        draw_confirm_exit(
-                            &mut canvas,
-                            nbr_cars,
-                            max_speed,
-                            min_speed,
-                            max_timer,
-                            min_timer,
-                            close_calls,
-                        );
                         if !ask_exit {
+                            let max_timer = vec_timer.iter().max().unwrap();
+                            let min_timer = vec_timer.iter().min().unwrap();
+                            draw_confirm_exit(
+                                &mut canvas,
+                                nbr_cars,
+                                max_speed,
+                                min_speed,
+                                max_timer,
+                                min_timer,
+                                close_calls,
+                            );
+                            canvas.present();
                             ask_exit = true;
                         } else {
-                            if !vec_timer.is_empty() {
-                                data(
-                                    nbr_cars,
-                                    max_speed,
-                                    min_speed,
-                                    max_timer,
-                                    min_timer,
-                                    close_calls,
-                                );
-                            }
+                            let max_timer = vec_timer.iter().max().unwrap();
+                            let min_timer = vec_timer.iter().min().unwrap();
+                            data(
+                                nbr_cars,
+                                max_speed,
+                                min_speed,
+                                max_timer,
+                                min_timer,
+                                close_calls,
+                            );
+                            break 'running;
                         }
-                        break 'running;
                     }
                 }
-
                 Event::KeyDown {
                     keycode: Some(k), ..
                 } => {
@@ -269,38 +271,78 @@ pub fn draw_confirm_exit(
     min_timer: &Duration,
     close_calls: i32,
 ) {
-    canvas.set_draw_color(sdl2::pixels::Color::RGB(50, 50, 50));
-    canvas.fill_rect(Rect::new(220, 260, 360, 300)).unwrap();
+   
+    canvas.set_draw_color(Color::RGB(0, 0, 0));
+    canvas.fill_rect(Rect::new(200, 220, 400, 300)).unwrap();
 
-    // عرض الصور BMP فقط
-    draw_image(canvas, "assets/total_vehicles_5.bmp", 240, 280);
-    draw_image(canvas, "assets/max_speed_50.bmp", 240, 320);
-    draw_image(canvas, "assets/min_speed_10.bmp", 240, 360);
+    let texts = vec![
+        format!("Total cars: {}", nbr_cars),
+        format!("Max speed: {}", max_speed),
+        format!("Min speed: {}", min_speed),
+        format!("Max time: {:.2?}", max_timer),
+        format!("Min time: {:.2?}", min_timer),
+        format!("Close calls: {}", close_calls),
+    ];
+
+    let mut y = 220;
+    for text in texts {
+        let img = text_to_image(&text);
+        let texture_creator = canvas.texture_creator();
+        let mut texture = texture_creator
+            .create_texture_static(
+                Some(sdl2::pixels::PixelFormatEnum::RGBA8888),
+                img.width(),
+                img.height(),
+            )
+            .unwrap();
+        texture
+            .update(None, &img, 4 * img.width() as usize)
+            .unwrap();
+        canvas
+            .copy(
+                &texture,
+                None,
+                Some(Rect::new(220, y, img.width(), img.height())),
+            )
+            .unwrap();
+        y += 50;
+    }
 
     canvas.present();
 }
 
-fn draw_image(canvas: &mut Canvas<Window>, path: &str, x: i32, y: i32) {
-    let surface = match sdl2::surface::Surface::load_bmp(path) {
-        Ok(s) => s,
-        Err(e) => {
-            eprintln!("Failed to load BMP '{}': {}", path, e);
-            return; // ما نكمّلوش إلا الصورة ما تحمّلاتش
+pub fn text_to_image(text: &str) -> RgbaImage {
+    let font_data = include_bytes!("../assets/DejaVuSans1.ttf");
+
+    let font = match Font::try_from_bytes(font_data as &[u8]) {
+        Some(f) => f,
+        None => {
+            eprintln!("Failed to load font from bytes!");
+            return RgbaImage::new(1, 1); 
         }
     };
 
-    let texture_creator = canvas.texture_creator();
-    let texture = match texture_creator.create_texture_from_surface(&surface) {
-        Ok(t) => t,
-        Err(e) => {
-            eprintln!("Failed to create texture from '{}': {}", path, e);
-            return;
-        }
-    };
+    let scale = Scale::uniform(20.0);
+    let width = 300;
+    let height = 40;
+    let mut img = RgbaImage::new(width, height);
 
-    let query = texture.query();
-    let target = Rect::new(x, y, query.width, query.height);
-    if let Err(e) = canvas.copy(&texture, None, Some(target)) {
-        eprintln!("Failed to draw texture '{}': {}", path, e);
+    for (i, c) in text.chars().enumerate() {
+        let v_metrics = font.v_metrics(scale);
+        let glyph = font.glyph(c).scaled(scale).positioned(rusttype::point(
+            5.0 + i as f32 * 15.0,
+            20.0 + v_metrics.ascent,
+        ));
+        if let Some(bb) = glyph.pixel_bounding_box() {
+            glyph.draw(|x, y, v| {
+                let px = x + bb.min.x as u32;
+                let py = y + bb.min.y as u32;
+                if px < width && py < height {
+                    img.put_pixel(px, py, Rgba([0, 0, 0, (v * 255.0) as u8]));
+                }
+            });
+        }
     }
+
+    img
 }
