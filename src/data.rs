@@ -39,8 +39,8 @@ pub fn data(
 pub fn draw_confirm_exit(
     canvas: &mut Canvas<Window>,
     nbr_cars: i32,
-    max_speed: i32,
-    min_speed: i32,
+    max_speed: f32,
+    min_speed: f32,
     max_timer: &Duration,
     min_timer: &Duration,
     close_calls: i32,

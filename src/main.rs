@@ -78,6 +78,7 @@ fn main() -> Result<(), String> {
     let mut cooldown_time = 0;
     let mut close_calls: i32 = 0;
     let mut vec_timer: Vec<Duration> = Vec::new();
+    let mut velocities: Vec<f32> = Vec::new();
 
     let mut event_pump = sdl_context.event_pump()?;
 
@@ -102,11 +103,14 @@ fn main() -> Result<(), String> {
                         if !ask_exit {
                             let max_timer = vec_timer.iter().max().unwrap();
                             let min_timer = vec_timer.iter().min().unwrap();
+                            let max_velocity = velocities.iter().cloned().fold(f32::MIN, f32::max);
+                            let min_velocity = velocities.iter().cloned().fold(f32::MAX, f32::min);
+
                             draw_confirm_exit(
                                 &mut canvas,
                                 nbr_of_cars,
-                                max_speed,
-                                min_speed,
+                                max_velocity,
+                                min_velocity,
                                 max_timer,
                                 min_timer,
                                 close_calls,
@@ -114,16 +118,6 @@ fn main() -> Result<(), String> {
                             canvas.present();
                             ask_exit = true;
                         } else {
-                            let max_timer = vec_timer.iter().max().unwrap();
-                            let min_timer = vec_timer.iter().min().unwrap();
-                            data(
-                                nbr_of_cars,
-                                max_speed,
-                                min_speed,
-                                max_timer,
-                                min_timer,
-                                close_calls,
-                            );
                             break 'running;
                         }
                     } else {
@@ -138,30 +132,18 @@ fn main() -> Result<(), String> {
 
                         let key = if k == Keycode::R {
                             let dirs = [Keycode::Up, Keycode::Down, Keycode::Left, Keycode::Right];
-                            let mut rng = rand::thread_rng();
+                            //  let mut rng = rand::thread_rng();
                             dirs[rng.gen_range(0..dirs.len())]
                         } else {
                             k
                         };
-                        
 
                         let ranger = rng.gen_range(0..3) * 45;
                         let (x, y, dir, angle) = match key {
-                            Keycode::Up => {
-                                (410 + ranger, 800, Direction::Up, 0.0)
-                            }
-                            Keycode::Down => {
-                                (275 + ranger, 0, Direction::Down, 180.0)
-                            }
-                            Keycode::Left => (
-                                800,
-                                270 + ranger,
-                                Direction::Left,
-                                -90.0,
-                            ),
-                            Keycode::Right => {
-                                (0, 400 + ranger, Direction::Right, 90.0)
-                            }
+                            Keycode::Up => (410 + ranger, 800, Direction::Up, 0.0),
+                            Keycode::Down => (275 + ranger, 0, Direction::Down, 180.0),
+                            Keycode::Left => (800, 270 + ranger, Direction::Left, -90.0),
+                            Keycode::Right => (0, 400 + ranger, Direction::Right, 90.0),
                             _ => (0, 0, Direction::Up, 0.0),
                         };
 
@@ -217,7 +199,7 @@ fn main() -> Result<(), String> {
                 } else {
                     v_mut.speed = 0;
                     v_mut.update();
-                   // v_mut.frame_count = 0;
+                    // v_mut.frame_count = 0;
                 }
                 let out = match v_mut.direction {
                     Direction::Up => v_mut.y < -10,
@@ -229,6 +211,7 @@ fn main() -> Result<(), String> {
                 if out {
                     nbr_of_cars += 1;
                     vec_timer.push(v_mut.timer.elapsed());
+                    velocities.push(v_mut.velocity);
                 } else {
                     new_cars.push_back(*v_mut);
                 }

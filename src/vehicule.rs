@@ -28,7 +28,8 @@ pub struct Vehicule {
     pub x: i32,
     pub y: i32,
     pub direction: Direction,
-    pub speed: i32,
+    pub speed: i32,      // control value (0 / 1 / 3)
+    pub velocity: f32,   // physics velocity
     pub distance: i32,
     pub timer: Instant,
     pub states: bool,
@@ -50,6 +51,7 @@ impl Vehicule {
             frame_count: 0,
             angle,
             turning: false,
+            velocity: 0.0,
         }
     }
 
@@ -132,6 +134,12 @@ impl Vehicule {
     }
 
     pub fn update(&mut self) {
+        let elapsed = self.timer.elapsed().as_secs_f32();
+
+        if elapsed > 0.0 {
+            self.velocity = self.distance as f32 / elapsed;
+        }
+
         if let Some(new_dir) = self.should_turning() {
             self.direction = new_dir;
             self.angle = match new_dir {
@@ -143,12 +151,14 @@ impl Vehicule {
             self.turning = false;
             self.speed = 0;
         }
+
         match self.direction {
             Direction::Up => self.y -= self.speed,
             Direction::Down => self.y += self.speed,
             Direction::Left => self.x -= self.speed,
             Direction::Right => self.x += self.speed,
         }
+
         self.distance += self.speed;
     }
 }
