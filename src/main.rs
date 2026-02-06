@@ -101,8 +101,17 @@ fn main() -> Result<(), String> {
                         if !ask_exit {
                             let max_timer = vec_timer.iter().max().unwrap();
                             let min_timer = vec_timer.iter().min().unwrap();
-                            let max_velocity = velocities.iter().cloned().fold(f32::MIN, f32::max);
-                            let min_velocity = velocities.iter().cloned().fold(f32::MAX, f32::min);
+                            let mut max_velocity = velocities[0];
+                            let mut min_velocity = velocities[0];
+
+                            for v in velocities.clone() {
+                                if v > max_velocity {
+                                    max_velocity = v;
+                                }
+                                if v < min_velocity {
+                                    min_velocity = v;
+                                }
+                            }
 
                             draw_confirm_exit(
                                 &mut canvas,
