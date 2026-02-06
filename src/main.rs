@@ -72,8 +72,6 @@ fn main() -> Result<(), String> {
 
     let mut rect: VecDeque<Vehicule> = VecDeque::new();
     let mut nbr_of_cars: i32 = 0;
-    let max_speed: i32 = 3;
-    let min_speed: i32 = 0;
     let mut can_add = false;
     let mut cooldown_time = 0;
     let mut close_calls: i32 = 0;

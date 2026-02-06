@@ -20,27 +20,12 @@ use sdl2::render::Canvas;
 use sdl2::video::Window;
 use std::time::Duration;
 
-pub fn data(
-    nbr_cars: i32,
-    max_speed: i32,
-    min_speed: i32,
-    max_timer: &Duration,
-    min_timer: &Duration,
-    close_calls: i32,
-) {
-    println!("number of cars: {}", nbr_cars);
-    println!("max speed: {}", max_speed);
-    println!("main speed: {}", min_speed);
-    println!("max timer: {:?}", max_timer);
-    println!("min timer: {:?}", min_timer);
-    println!("close calls: {}", close_calls);
-}
 
 pub fn draw_confirm_exit(
     canvas: &mut Canvas<Window>,
     nbr_cars: i32,
-    max_speed: f32,
-    min_speed: f32,
+    max_velocity: f32,
+    min_velocity: f32,
     max_timer: &Duration,
     min_timer: &Duration,
     close_calls: i32,
@@ -50,8 +35,8 @@ pub fn draw_confirm_exit(
 
     let texts = vec![
         format!("Total cars: {}", nbr_cars),
-        format!("Max speed: {}", max_speed),
-        format!("Min speed: {}", min_speed),
+        format!("Max_Velocity: {} ", max_velocity),
+        format!("Min_Velocity: {} " , min_velocity),
         format!("Max time: {:.2?}", max_timer),
         format!("Min time: {:.2?}", min_timer),
         format!("Close calls: {}", close_calls),
